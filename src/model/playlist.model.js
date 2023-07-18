@@ -8,23 +8,21 @@ const playlistSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  track: {
-    type: String,
-    required: true,
-  },
   owner: {
     type: mongoose.Types.ObjectId,
     ref: "song",
   },
-  songs: {
-    type: Array,
-    required: false,
-    default: [],
-  },
-  collaborators: {
-    type: Array,
-    required: false,
-    default: [],
-  },
+  songs: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "song",
+    },
+  ],
+  collaborators: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 module.exports = mongoose.model("playlist", playlistSchema);

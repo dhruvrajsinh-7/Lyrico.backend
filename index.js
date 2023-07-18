@@ -1,18 +1,20 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const JwtStrategy = require("passport-jwt").Strategy,
+  ExtractJwt = require("passport-jwt").ExtractJwt;
 const passport = require("passport");
 const db = require("./src/db.config.js");
-const User = require("./src/user/user.model.js");
+const User = require("./src/model/user.model.js");
+const authRoutes = require("./src/Routes/Auth.routes.js");
+const songRoutes = require("./src/Routes/song.routes.js");
+const playlistRoutes = require("./src/Routes/playlist.routes.js");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Dhruv's application." });
 });
-
-var JwtStrategy = require("passport-jwt").Strategy,
-  ExtractJwt = require("passport-jwt").ExtractJwt;
 
 let opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
@@ -32,6 +34,9 @@ passport.use(
     });
   })
 );
+app.use("/auth", authRoutes);
+// app.use("/song", songRoutes);
+// app.use("/playlist", playlistRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
