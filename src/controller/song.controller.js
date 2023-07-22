@@ -2,14 +2,14 @@ const Song = require("../model/song.model");
 const User = require("../model/user.model");
 
 async function CreateSong(req, res) {
-  const artist = req.user._id;
   const { songname, thumbnail, track } = req.body;
 
   try {
     if (!songname || !thumbnail || !track) {
       return res.status(400).json({ message: "Please fill all the fields" });
     }
-
+    const artist = req.user._id;
+    console.log(artist);
     const newSong = new Song({
       songname,
       thumbnail,

@@ -13,3 +13,6 @@ router.get("/get/mysongs", GetMySong);
 router.get("/get/allsongs", GetAllSongs);
 router.get("/get/artistsong/:artistsongId", GetArtistSong);
 router.get("/get/song/:songName", GetSong);
+
+module.exports = router;
+``;
