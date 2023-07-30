@@ -20,20 +20,22 @@ app.get("/", (req, res) => {
 let opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = "IAMTHESECRETKEYHERECRACKMEIFYOUCAN";
+
 passport.use(
-  new JwtStrategy(opts, function (jwt_payload, done) {
-    User.findOne({ id: jwt_payload.sub }, function (err, user) {
-      if (err) {
-        return done(err, false);
-      }
+  new JwtStrategy(opts, async function (jwt_payload, done) {
+    try {
+      const user = await User.findOne({ _id: jwt_payload.identifier });
       if (user) {
         return done(null, user);
       } else {
         return done(null, false);
       }
-    });
+    } catch (err) {
+      return done(err, false);
+    }
   })
 );
+
 app.use("/auth", authRoutes);
 app.use("/song", songRoutes);
 app.use("/playlist", playlistRoutes);
