@@ -7,16 +7,17 @@ async function CreatePlaylist(req, res) {
   const { songname, thumbnail, songs } = req.body;
 
   try {
-    if (!songname || !thumbnail || !songs) {
-      res.status(400).json({ message: "Please fill all the fields" });
+    if (!songname || !thumbnail) {
+      res.status(400).json({ message: "Please fill all the required fields" });
       return;
     }
 
     const newplaylist = new playlist({
       songname,
       thumbnail,
-      songs,
-      user: currentUser._id,
+      songs: songs || [],
+      owner: currentUser._id,
+      collaborators: [currentUser._id],
     });
 
     await newplaylist.save();
@@ -40,8 +41,7 @@ async function GetPlaylist(req, res) {
     res.status(400).json({ message: "Error getting playlist" });
   }
 }
-
-async function GetAllPlaylist(req, res) {
+async function GetMyPlaylists(req, res) {
   const artistid = req.user._id;
 
   try {
@@ -81,15 +81,15 @@ async function AddSong(req, res) {
   const { playlistId, songId } = req.body;
 
   try {
-    const playlist = await playlist.findById(playlistId);
-    if (!playlist) {
+    const playlistObj = await playlist.findById(playlistId);
+    if (!playlistObj) {
       res.status(400).json({ message: "Playlist not found" });
       return;
     }
 
     if (
-      !playlist.owner.equals(currentUser._id) &&
-      !playlist.collaborators.includes(currentUser._id)
+      !playlistObj.owner.equals(currentUser._id) &&
+      !playlistObj.collaborators.includes(currentUser._id)
     ) {
       res.status(400).json({ message: "You are not authorized to add songs" });
       return;
@@ -101,18 +101,19 @@ async function AddSong(req, res) {
       return;
     }
 
-    playlist.songs.push(songId);
-    await playlist.save();
-    res.status(200).json(playlist);
+    playlistObj.songs.push(songId);
+    await playlistObj.save();
+    res.status(200).json(playlistObj);
   } catch (err) {
     res.status(400).json({ message: "Error adding song" });
+    console.error(err);
   }
 }
 
 module.exports = {
   CreatePlaylist,
   GetPlaylist,
-  GetAllPlaylist,
+  GetMyPlaylists,
   GetArtistPlaylist,
   AddSong,
 };
